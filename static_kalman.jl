@@ -46,7 +46,7 @@ end
 
 Perform a correction step of the Kalman filter, i.e., update the state estimate based on a measurement.
 """
-function correct(state::S, kf::KF, u, y) where S <: State
+function correct(state::S, kf::KF, u, y::Y)::Tuple{S,Y} where {S <: State, Y}
     (; C,D,R2) = kf
     (; x,R) = state
     e   = y .- C*x .- D*u
