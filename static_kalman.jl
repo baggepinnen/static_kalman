@@ -97,10 +97,13 @@ state, e = correct(state, kf, u0, y0)
 @code_warntype predict(state, kf, u0)
 @code_warntype correct(state, kf, u0, y0)
 
-## Check for type instabilities using JET
+## Check for type instabilities using JET. This looks deeper than @code_warntype above.
 using JET
-@report_opt predict(state, kf, u0)
-@report_opt correct(state, kf, u0, y0)
+@test_opt predict(state, kf, u0)
+@test_opt correct(state, kf, u0, y0)
+
+@test_call predict(state, kf, u0)
+@test_call correct(state, kf, u0, y0)
 
 ## Compile predict step
 argtypes_predict = Tuple{typeof(state), typeof(kf), typeof(u0)}
