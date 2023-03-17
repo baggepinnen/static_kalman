@@ -65,28 +65,28 @@ end
 
 
 ## Create an example system, double integrator
-nx = 2
-nu = 1
-ny = 1
-T = Float32
+nx = 2 # Number of state variables
+nu = 1 # Number of inputs
+ny = 1 # Number of outputs
+T = Float32 # Numeric type used for the computations
 
 A = @SMatrix T[1 1; 0 1]
 B = @SMatrix T[0; 1]
 C = @SMatrix T[1 0]
 D = @SMatrix T[0]
 
-R1 = @SMatrix T[1 0; 0 1]
-R2 = @SMatrix T[1]
+R1 = @SMatrix T[1 0; 0 1] # Process noise covariance
+R2 = @SMatrix T[1]        # Measurement noise covariance
 
-x0 = @SVector T[0, 0]
-R0 = @SMatrix T[1 0; 0 1]
+x0 = @SVector T[0, 0]     # Initial state vector
+R0 = @SMatrix T[1 0; 0 1] # Initial state covariance
 
-state = State{T,nx,nx,nx^2}(x0, R0)
-kf = KF(A, B, C, D, R1, R2)
+state = State{T,nx,nx,nx^2}(x0, R0) # Initial filter state
+kf = KF(A, B, C, D, R1, R2)         # Kalman filter
 
 ## Some sample inputs
-u0 = @SVector randn(T, nu)
-y0 = @SVector randn(T, ny)
+u0 = @SVector randn(T, nu)          # Input vector
+y0 = @SVector randn(T, ny)          # Measurement vector
 
 
 ## Test that the functions work
@@ -99,7 +99,7 @@ state, e = correct(state, kf, u0, y0)
 
 ## Compile predict step
 argtypes_predict = Tuple{typeof(state), typeof(kf), typeof(u0)}
-predict_compiled, path_predict = compile(predict, argtypes_predict, "predict")
+predict_compiled, path_predict = compile(predict, argtypes_predict, "predict") # Use compile_executable or compile_shlib instead to get binaries
 
 ## Test predict step
 state2 = predict(state, kf, u0)
@@ -114,3 +114,4 @@ correct_compiled, path_correct = compile(correct, argtypes_correct, "correct")
 state3, e = correct(state, kf, u0, y0)
 state3_compiled, e_compiled = correct_compiled(state, kf, u0, y0)
 @assert state3 === state3_compiled
+@assert e === e_compiled
