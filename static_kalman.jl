@@ -60,7 +60,7 @@ function correct(state::S, kf::KF, u, y::Y)::Tuple{S,Y} where {S <: State, Y}
 end
 
 @inline function symmetrize(x::SArray)
-    0.5 .* (x .+ x')
+    eltype(x)(0.5) .* (x .+ x')
 end
 
 
@@ -68,7 +68,7 @@ end
 nx = 2
 nu = 1
 ny = 1
-T = Float64
+T = Float32
 
 A = @SMatrix T[1 1; 0 1]
 B = @SMatrix T[0; 1]
@@ -85,8 +85,8 @@ state = State{T,nx,nx,nx^2}(x0, R0)
 kf = KF(A, B, C, D, R1, R2)
 
 ## Some sample inputs
-u0 = @SVector randn(nu)
-y0 = @SVector randn(ny)
+u0 = @SVector randn(T, nu)
+y0 = @SVector randn(T, ny)
 
 
 ## Test that the functions work
