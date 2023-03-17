@@ -12,10 +12,10 @@ end
     KF{T, nx, nu, ny, nx2, nxnu, nxny, nynu, ny2}
     KF(A, B, C, D, R1, R2)
 
-A Kalman filter for the dynamics
+A Kalman filter for the (discrete-time) dynamics
 ```math
 x(t+1) = A x(t) + B u(t) + w(t)
-y(t) = C x(t) + D u(t) + v(t)
+y(t)   = C x(t) + D u(t) + v(t)
 ```
 where ``w(t)`` and ``v(t)`` are independent zero-mean Gaussian noise processes with covariance matrices ``R1`` and ``R2``, respectively.
 """
