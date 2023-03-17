@@ -8,6 +8,17 @@ struct State{T,nx,nu,nx2}
     R::SMatrix{nx,nx, T, nx2}
 end
 
+"""
+    KF{T, nx, nu, ny, nx2, nxnu, nxny, nynu, ny2}
+    KF(A, B, C, D, R1, R2)
+
+A Kalman filter for the dynamics
+```math
+x(t+1) = A x(t) + B u(t) + w(t)
+y(t) = C x(t) + D u(t) + v(t)
+```
+where ``w(t)`` and ``v(t)`` are independent zero-mean Gaussian noise processes with covariance matrices ``R1`` and ``R2``, respectively.
+"""
 struct KF{T,nx,nu,ny,nx2,nxnu,nxny,nynu,ny2}
     A::SMatrix{nx,nx, T, nx2}
     B::SMatrix{nx,nu, T, nxnu}
@@ -17,6 +28,11 @@ struct KF{T,nx,nu,ny,nx2,nxnu,nxny,nynu,ny2}
     R2::SMatrix{ny,ny, T, ny2}
 end
 
+"""
+    new_state = predict(state::S, kf::KF, u)
+
+Perform a prediction step of the Kalman filter, i.e., evolve the dynamics one time step forward.
+"""
 function predict(state::S, kf::KF, u)::S where S <: State
     (; A,B,R1) = kf
     (; x,R) = state
@@ -25,7 +41,11 @@ function predict(state::S, kf::KF, u)::S where S <: State
     S(x, R)
 end
 
+"""
+    new_state, prediction_error = correct(state::S, kf::KF, u, y)
 
+Perform a correction step of the Kalman filter, i.e., update the state estimate based on a measurement.
+"""
 function correct(state::S, kf::KF, u, y) where S <: State
     (; C,D,R2) = kf
     (; x,R) = state
