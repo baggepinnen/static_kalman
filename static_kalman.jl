@@ -97,6 +97,11 @@ state, e = correct(state, kf, u0, y0)
 @code_warntype predict(state, kf, u0)
 @code_warntype correct(state, kf, u0, y0)
 
+## Check for type instabilities using JET
+using JET
+@report_opt predict(state, kf, u0)
+@report_opt correct(state, kf, u0, y0)
+
 ## Compile predict step
 argtypes_predict = Tuple{typeof(state), typeof(kf), typeof(u0)}
 predict_compiled, path_predict = compile(predict, argtypes_predict, "predict") # Use compile_executable or compile_shlib instead to get binaries

@@ -1,7 +1,7 @@
 # static_kalman
 See [static_kalman.jl](https://github.com/baggepinnen/static_kalman/blob/main/static_kalman.jl)
 
-This repo demonstrates how to use [StaticCompiler.jl](https://github.com/tshort/StaticCompiler.jl) to statically compile a Julia function in a wat that makes it callable from a C program.
+This repo demonstrates how to use [StaticCompiler.jl](https://github.com/tshort/StaticCompiler.jl) to statically compile a Julia function in a way that makes it callable from a C program.
 
 The example makes use of StaticArrays.jl for stack-allocated arrays with compile-time known dimensions.
 
