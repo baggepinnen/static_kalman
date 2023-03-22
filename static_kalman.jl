@@ -128,12 +128,18 @@ state3_compiled, e_compiled = correct_compiled(state, kf, u0, y0)
 
 ## Making predict callable from C
 # We start by defining methods that take Refs instead of the actual values, and unpacks the reference before calling the original function.
+# I have thus far not been able to return a Julia object directly, and I thus update the state reference with the result and return an Int
 function predict(state::Ref, kf::Ref, u0::Ref)
     state2 = predict(state[], kf[], u0[])
     state[] = state2 # Store result in the incoming state
     0
 end
-correct(x1::Ref, x2::Ref, x3::Ref, x4::Ref) = correct(x1[], x2[], x3[], x4[])
+
+function correct(state::Ref, kf::Ref, u0::Ref, y0::Ref)
+    state2, e = correct(state[], kf[], u0[], y0[])
+    state[] = state2 # Store result in the incoming state
+    e
+end
 
 # We then change the signature of the compiled function to instead take these references
 using Base: RefValue
@@ -158,11 +164,12 @@ end
 To actually call this code from C, we need to write some C code.
 I'm not interested in coming up with the C structs that represent my Julia types,
 so I'll just create one C array for the KF type and one for the State type.
+
+These two lines are needed to make the C code find the shared library. In my case, I had to call
+LD_LIBRARY_PATH=/home/fredrikb/Desktop/semi_tmp/static_kalman/predict/
+export LD_LIBRARY_PATH
+
+And then compile with the following command:
 =#
-
-# These two lines are needed to make the C code find the shared library
-# LD_LIBRARY_PATH=/home/fredrikb/Desktop/semi_tmp/static_kalman/predict/
-# export LD_LIBRARY_PATH
-
 
 run(`gcc test.c  -Lpredict -lpredict -o test`)
