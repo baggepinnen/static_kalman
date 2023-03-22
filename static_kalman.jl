@@ -123,3 +123,32 @@ state3, e = correct(state, kf, u0, y0)
 state3_compiled, e_compiled = correct_compiled(state, kf, u0, y0)
 @assert state3 === state3_compiled
 @assert e === e_compiled
+
+
+
+## Making predict callable from C
+# We start by defining methods that take Refs instead of the actual values, and unpacks the reference before calling the original function.
+predict(x1::Ref, x2::Ref, x3::Ref) = predict(x1[], x2[], x3[])
+correct(x1::Ref, x2::Ref, x3::Ref, x4::Ref) = correct(x1[], x2[], x3[], x4[])
+
+# We then change the signature of the compiled function to instead take these references
+using Base: RefValue
+argtypes_predict = Tuple{RefValue{typeof(state)}, RefValue{typeof(kf)}, RefValue{typeof(u0)}}
+path_predict = compile_shlib(predict, argtypes_predict, "predict") # Use compile_executable or compile_shlib instead to get binaries
+
+# To test that we can call the compiled funciton from C, we make a C-call. This step would be performed in C otherwise. To do this, we first wrap our Julia objects in `Ref` and then obtain pointers to those.
+# We tell ccall that we are providing Ptr{Nothing}, but the return type is declared to be the actual Julia type, without pointers or references.
+function c_predict(state, kf, u0)
+    rstate, rkf, ru0 = Ref(state), Ref(kf), Ref(u0)
+    out = Ref{typeof(state)}()
+    Libc.Libdl.dlopen(path_predict) do lib
+        fn = Libc.Libdl.dlsym(lib, :julia_predict)
+        GC.@preserve rstate rkf ru0 begin
+            pstate, pkf, pu0 = pointer_from_objref(rstate), pointer_from_objref(rkf), pointer_from_objref(ru0)
+            res = ccall(fn, State{Float32, 2, 4}, (Ptr{Nothing}, Ptr{Nothing}, Ptr{Nothing}), pstate, pkf, pu0)
+            # unsafe_load(res)
+        end
+    end
+end
+
+c_predict(state, kf, u0) === state2 # It works
