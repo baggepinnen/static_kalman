@@ -1,5 +1,5 @@
 #include <stdio.h>
-extern float * julia_predict(float *state, float *kf, float *u0);
+extern int julia_predict(float *state, float *kf, float *u0);
 
 float state[] = {0, 0, 1, 0, 0, 1}; // This initializes the variable that in the julia example code is called "state". It's stored in the order [state.x; vec(state.R)]
 float kf[] = {1.0f,0.0f,1.0f,1.0f,0.0f,1.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,1.0f};
