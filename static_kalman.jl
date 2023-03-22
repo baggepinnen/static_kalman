@@ -128,25 +128,41 @@ state3_compiled, e_compiled = correct_compiled(state, kf, u0, y0)
 
 ## Making predict callable from C
 # We start by defining methods that take Refs instead of the actual values, and unpacks the reference before calling the original function.
-predict(x1::Ref, x2::Ref, x3::Ref) = predict(x1[], x2[], x3[])
+function predict(state::Ref, kf::Ref, u0::Ref)
+    state2 = predict(state[], kf[], u0[])
+    state[] = state2 # Store result in the incoming state
+    0
+end
 correct(x1::Ref, x2::Ref, x3::Ref, x4::Ref) = correct(x1[], x2[], x3[], x4[])
 
 # We then change the signature of the compiled function to instead take these references
 using Base: RefValue
 argtypes_predict = Tuple{RefValue{typeof(state)}, RefValue{typeof(kf)}, RefValue{typeof(u0)}}
-path_predict = compile_shlib(predict, argtypes_predict, "predict") # Use compile_executable or compile_shlib instead to get binaries
+path_predict = compile_shlib(predict, argtypes_predict, "predict"; filename="libpredict") # Use compile_executable or compile_shlib instead to get binaries
 
-# To test that we can call the compiled funciton from C, we make a C-call. This step would be performed in C otherwise. To do this, we first wrap our Julia objects in `Ref` and then obtain pointers to those.
-# We tell ccall that we are providing Ptr{Nothing}, but the return type is declared to be the actual Julia type, without pointers or references.
+# To test that we can call the compiled funciton from C, we make a C-call.
+# This step would be performed in C otherwise.
+# To do this, we say that we are passing references to our Julia objects, the ccall will create those references automatically
 function c_predict(state, kf, u0)
-    rstate, rkf, ru0 = Ref(state), Ref(kf), Ref(u0)
     Libc.Libdl.dlopen(path_predict) do lib
         fn = Libc.Libdl.dlsym(lib, :julia_predict)
-        GC.@preserve rstate rkf ru0 begin
-            pstate, pkf, pu0 = pointer_from_objref(rstate), pointer_from_objref(rkf), pointer_from_objref(ru0)
-            res = ccall(fn, State{Float32, 2, 4}, (Ptr{Nothing}, Ptr{Nothing}, Ptr{Nothing}), pstate, pkf, pu0)
+        GC.@preserve state kf u0 begin
+            res = ccall(fn, Cint, (Ref{State{Float32, 2, 4}}, Ref{KF{Float32, 2, 1, 1, 4, 2, 2, 1, 1}}, Ref{SVector{1, Float32}}), state, kf, u0)
         end
     end
 end
 
-c_predict(state, kf, u0) === state2 # It works
+
+##
+#=
+To actually call this code from C, we need to write some C code.
+I'm not interested in coming up with the C structs that represent my Julia types,
+so I'll just create one C array for the KF type and one for the State type.
+=#
+
+# These two lines are needed to make the C code find the shared library
+# LD_LIBRARY_PATH=/home/fredrikb/Desktop/semi_tmp/static_kalman/predict/
+# export LD_LIBRARY_PATH
+
+
+run(`gcc test.c  -Lpredict -lpredict -o test`)
