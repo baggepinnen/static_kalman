@@ -22,7 +22,7 @@ end
 ```
 This wrapper simply unpacks the incoming references from the C program and calls the standard julia method. On the C-side, this looks like:
 ```c
-extern float * julia_predict(float *state, float *kf, float *u0); // Forward declaration
+extern int julia_predict(float *state, float *kf, float *u0); // Forward declaration
 julia_predict(state, kf, u0); // This updates state
 ```
 See [test.c](https://github.com/baggepinnen/static_kalman/blob/main/test.c) for the full C code.
