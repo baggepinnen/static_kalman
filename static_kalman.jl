@@ -140,13 +140,11 @@ path_predict = compile_shlib(predict, argtypes_predict, "predict") # Use compile
 # We tell ccall that we are providing Ptr{Nothing}, but the return type is declared to be the actual Julia type, without pointers or references.
 function c_predict(state, kf, u0)
     rstate, rkf, ru0 = Ref(state), Ref(kf), Ref(u0)
-    out = Ref{typeof(state)}()
     Libc.Libdl.dlopen(path_predict) do lib
         fn = Libc.Libdl.dlsym(lib, :julia_predict)
         GC.@preserve rstate rkf ru0 begin
             pstate, pkf, pu0 = pointer_from_objref(rstate), pointer_from_objref(rkf), pointer_from_objref(ru0)
             res = ccall(fn, State{Float32, 2, 4}, (Ptr{Nothing}, Ptr{Nothing}, Ptr{Nothing}), pstate, pkf, pu0)
-            # unsafe_load(res)
         end
     end
 end
