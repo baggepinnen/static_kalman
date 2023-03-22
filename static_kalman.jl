@@ -1,7 +1,7 @@
 cd(@__DIR__)
 using Pkg
 Pkg.activate(".")
-using StaticTools, StaticArrays, LinearAlgebra, StaticCompiler
+using StaticArrays, LinearAlgebra, StaticCompiler
 
 struct State{T,nx,nx2}
     x::SVector{nx, T}
