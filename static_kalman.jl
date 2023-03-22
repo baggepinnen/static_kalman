@@ -85,13 +85,13 @@ state = State(x0, R0)       # Initial filter state
 kf = KF(A, B, C, D, R1, R2) # Kalman filter
 
 ## Some sample inputs
-u0 = @SVector randn(T, nu)  # Input vector
+u0 = @SVector T[7]  # Input vector
 y0 = @SVector randn(T, ny)  # Measurement vector
 
 
 ## Test that the functions work
-state = predict(state, kf, u0)
-state, e = correct(state, kf, u0, y0)
+statep = predict(state, kf, u0)
+statec, e = correct(statep, kf, u0, y0)
 
 ## Type stable? If not, some variable types are printed in red. Type stability required for compilation
 @code_warntype predict(state, kf, u0)

@@ -38,10 +38,10 @@ gcc test.c  -Lpredict -lpredict -o test`
 Running
 ```bash
 /home/fredrikb/Desktop/semi_tmp/static_kalman> ./test
--0.692155 0.470533 4.000000 2.000000 2.000000 2.750000 
+0.000000 7.000000 3.000000 1.000000 1.000000 2.000000 
 ```
 results in the same numerical values as the present in the Julia object `state2`:
 ```julia
 julia> state2
-State{Float32, 2, 4}(Float32[-0.69215477, 0.47053307], Float32[4.0 2.0; 2.0 2.75])
+State{Float32, 2, 4}(Float32[0.0, 7.0], Float32[3.0 1.0; 1.0 2.0])
 ```

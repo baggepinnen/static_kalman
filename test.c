@@ -1,9 +1,9 @@
 #include <stdio.h>
 extern float * julia_predict(float *state, float *kf, float *u0);
 
-float state[] = { -0.79493254f, 0.10277778f, 0.75f, 0.25f, 0.25f, 1.75f };
+float state[] = {0, 0, 1, 0, 0, 1}; // This initializes the variable that in the julia example code is called "state". It's stored in the order [state.x; vec(state.R)]
 float kf[] = {1.0f,0.0f,1.0f,1.0f,0.0f,1.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,1.0f};
-float u0[] = {0.3677553f};
+float u0[] = {7.0f};
 
 int main(){
     julia_predict(state, kf, u0); // This updates state
