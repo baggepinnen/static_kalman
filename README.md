@@ -46,3 +46,6 @@ results in the same numerical values as the present in the Julia object `state2`
 julia> state2
 State{Float32, 2, 4}(Float32[0.0, 7.0], Float32[3.0 1.0; 1.0 2.0])
 ```
+
+## Running on Raspberry Pi (ARMv7)
+The procedure above has been verified to work without modification on the Raspberry Pi 4b with a 64bit Raspbian OS. Cross compilation is currently not available, so the compilation was performed on the Raspberry Pi itself.
