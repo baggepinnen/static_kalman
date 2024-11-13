@@ -1,3 +1,6 @@
+cd(@__DIR__)
+using Pkg
+Pkg.activate(".")
 using ModelingToolkit, StaticArrays
 p_cstr = (;
     K0_ab   = 1.287e12, # K0 [h^-1]
@@ -74,5 +77,43 @@ end
 @named model = CSTR()
 cmodel = complete(model)
 inputs = [cmodel.F, cmodel.Q̇]
-(cont_dynamics, f_ip), x_sym, p, io_sys = ModelingToolkit.generate_control_function(model, inputs, force_SA=true, expression=true)
+(f_oop, f_ip), x_sym, p, io_sys = ModelingToolkit.generate_control_function(model, inputs)
 
+
+script = "dynamics.jl"
+name,ext = splitext(script)
+
+
+
+# oop
+using MacroTools
+expr = ModelingToolkit.RuntimeGeneratedFunctions.get_expression(f_oop)
+expr = expr |> MacroTools.flatten |> MacroTools.unblock |> MacroTools.rmlines # |> MacroTools.prettify
+
+expr = MacroTools.postwalk(expr) do x
+    if @capture(x, f_(args__)) && Symbol(f) == :create_array
+        quote
+            SA[$(args[5:end]...)]
+        end
+    elseif @capture(x, y_) && y isa LineNumberNode
+        :()
+    else
+        x
+    end
+end
+expr = expr |> MacroTools.flatten |> MacroTools.unblock |> MacroTools.rmlines
+display(expr)
+
+dict = splitdef(expr)
+dict[:name] = Symbol(name)
+expr = MacroTools.combinedef(dict)
+
+open(script, "w") do io
+    println(io, "\"\"\"")
+    println(io, "$name(x, u, p, t)")
+    println(io, "state x: ", string.(x_sym))
+    println(io, "input u: ", string.(inputs))
+    println(io, "parameters p: ", string.(p))
+    println(io, "\"\"\"")
+    println(io, expr)
+end
