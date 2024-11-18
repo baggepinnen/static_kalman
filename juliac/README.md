@@ -12,7 +12,7 @@ juliac is not yet available in any released version of Julia and must thus be ob
 ## Instructions
 1. Obtain the juliac driver script by either cloning the [julialang/julia repo](https://github.com/JuliaLang/julia) or by downloading the scripts independently using the instructions provided [in this blog post](https://jbytecode.github.io/juliac/).
 2. Clone this repository and instantiate the manifest in this folder (a [special branch of LowLevelParticleFilters is required](https://github.com/baggepinnen/LowLevelParticleFilters.jl/tree/juliac)).
-3. Run the script `cstr_model.jl` to generate the julia file containing the function that computes the dynamics.
+3. Run the script `julia --project cstr_model.jl` to generate the julia file containing the function that computes the dynamics.
 4. Invoke the juliac compiler using something like `julia +nightly --project=<...>/static_kalman/juliac <...>/julia/contrib/juliac.jl --output-exe juliac_demo --trim=unsafe-warn <...>/static_kalman/juliac/juliac_demo.jl`. `julia +nightly` assumes that you are using the nightly version of julia installed using _juliaup_, if you have downloaded and compiled julia from source, point to your compiled binary instead. Replace `<...>` with the appropriate paths, i.e., the path to the julia source folder and the folder where you cloned this repository.
 5. Run the compiled binary `./juliac_demo` to perform the state estimation and output the log-likelihood of the data.
 

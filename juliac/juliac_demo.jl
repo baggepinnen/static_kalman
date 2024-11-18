@@ -61,7 +61,7 @@ end
 
 # cd(@__DIR__)
 # compile using something like
-# run(`julia +nightly --project=/home/fredrikb/Desktop/semi_tmp/static_kalman/juliac /home/fredrikb/repos/julia/contrib/juliac.jl --output-exe juliac_demo --trim=unsafe-warn /home/fredrikb/Desktop/semi_tmp/static_kalman/juliac/juliac_demo.jl`)
+# run(`julia +nightly --project=/home/fredrikb/repos/static_kalman/juliac /home/fredrikb/repos/julia/contrib/juliac.jl --output-exe juliac_demo --trim=unsafe-warn /home/fredrikb/repos/static_kalman/juliac/juliac_demo.jl`)
 # run(`ls -ltrh`) # marvel at the smallness of the binary
 # run(`./juliac_demo`)
 
