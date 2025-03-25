@@ -1,6 +1,10 @@
 This demonstration shows how to use juliac to compile a binary that performs Kalman filtering with a model implemented using ModelingToolkit.jl.
 
-We
+We include two demos, one where juliaC compiles an executable, and one where juliaC creates a shared library that is called from a C program.
+
+For the executable demo, we perform the following steps:
+
+# Executable demo
 
 1. Build a simple model of a continuously stirred tank reactor (CSTR) using MTK
 2. Generate a function that computes the dynamics on the form $\dot x = f(x, u, p, t)$ and  extract the julia expression of this function into a separate file.
@@ -19,3 +23,10 @@ juliac is not yet available in any released version of Julia and must thus be ob
 
 ## Running on Raspberry Pi
 Follow exactly the same procedure as above, but directly on the Raspberry Pi instead. I've successfully tested this on a Raspberry Pi model 4 with 4GB of RAM, running Raspbian OS.
+
+
+# Shared library demo
+Follow steps 1-3 from the instructions above. 
+4. Invoke the juliac compiler using something like `julia +1.12-nightly --project=<..>/static_kalman/juliac ~/.julia/juliaup/julia-1.12-nightly/share/julia/juliac.jl --output-lib juliac_library --trim=unsafe-warn --experimental --compile-ccallable <..>/static_kalman/juliac/juliac_library.jl`
+5. Compile the C program using something like `gcc -o state_estimation_program test_juliac_library.c -I <..>/.julia/juliaup/julia-1.12-nightly/include/julia/ -L<..>/.julia/juliaup/julia-1.12-nightly/lib -ljulia -ldl`
+6. Run the compiled C program `./state_estimation_program` to perform the state estimation using the sample inputs defined in the C file.
