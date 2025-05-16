@@ -34,4 +34,4 @@ jobs:
             version: nightly
             arch: aarch64
         - uses: julia-actions/cache@v2
-        - run: julia -e 'import Pkg; Pkg.develop(path="dev/lowlevelparticlefilters")'
+        - run: julia -e 'import Pkg; Pkg.activate("juliac"); Pkg.develop(path="dev/lowlevelparticlefilters")'
