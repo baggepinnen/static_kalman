@@ -22,17 +22,22 @@ jobs:
       contents: read
     steps:
         - uses: actions/checkout@v4
-      
-        - name: Checkout tools repo
+        - name: Checkout LLPF repo
           uses: actions/checkout@v4
           with:
             repository: baggepinnen/LowLevelParticleFilters.jl
             ref: juliac
             path: dev/lowlevelparticlefilters
+        - name: Checkout Julia repo
+          uses: actions/checkout@v4
+          with:
+            repository: JuliaLang/julia
+            path: dev/julia
         - uses: julia-actions/setup-julia@v2
           with:
             version: nightly
             arch: aarch64
         - uses: julia-actions/cache@v2
-        - run: julia -e 'import Pkg; Pkg.activate("juliac/build_model_project"); Pkg.instantiate(); cd("juliac/build_model_project"); include("cstr_model.jl")'
+        - run: julia -e 'import Pkg; Pkg.activate("juliac/build_model_project"); Pkg.instantiate(); cd("juliac/build_model_project"); include("cstr_model.jl"); cp("dynamics.jl", "../dynamics.jl")'
         - run: julia -e 'import Pkg; Pkg.activate("juliac"); Pkg.develop(path="dev/lowlevelparticlefilters");'
+        - run: julia +nightly --project=juliac dev/julia/contrib/juliac.jl --output-exe juliac_demo --trim=unsafe-warn juliac/juliac_demo.jl
