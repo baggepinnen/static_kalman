@@ -26,7 +26,7 @@ jobs:
         - name: Checkout tools repo
           uses: actions/checkout@v4
           with:
-            repository: https://github.com/baggepinnen/LowLevelParticleFilters.jl.git
+            repository: baggepinnen/LowLevelParticleFilters.jl
             ref: juliac
             path: dev/lowlevelparticlefilters
         - uses: julia-actions/setup-julia@v2
