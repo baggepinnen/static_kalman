@@ -21,8 +21,17 @@ jobs:
       actions: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v2
-        with:
-          version: nightly
-          arch: aarch64
+        - uses: actions/checkout@v4
+      
+        - name: Checkout tools repo
+          uses: actions/checkout@v4
+          with:
+            repository: https://github.com/baggepinnen/LowLevelParticleFilters.jl.git
+            ref: juliac
+            path: dev/lowlevelparticlefilters
+        - uses: julia-actions/setup-julia@v2
+          with:
+            version: nightly
+            arch: aarch64
+        - uses: julia-actions/cache@v2
+        - run: julia -e 'import Pkg; Pkg.develop("dev/lowlevelparticlefilters")'
