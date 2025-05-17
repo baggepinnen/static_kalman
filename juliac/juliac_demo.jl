@@ -38,7 +38,7 @@ const d0 = LowLevelParticleFilters.SimpleMvNormal(x0,R1)   # Initial state Distr
 
 println(Core.stdout, 1)
 # const kf   = KalmanFilter(_A, _B, _C, 0, R1, R2, d0, check=false)
-const kf = UnscentedKalmanFilter(discrete_dynamics_wrapper, measurement, R1, R2, d0; ny, nu, p=nothing) 
+const kf = UnscentedKalmanFilter(discrete_dynamics_wrapper, measurement, R1, R2, d0; ny, nu, p=p) 
 println(Core.stdout, 2)
 
 Base.@ccallable function main()::Cint
