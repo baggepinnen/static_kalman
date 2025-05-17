@@ -41,6 +41,8 @@ jobs:
         - run: julia -e 'import Pkg; Pkg.activate("juliac/build_model_project"); Pkg.instantiate(); cd("juliac/build_model_project"); include("cstr_model.jl"); cp("dynamics.jl", "../dynamics.jl")'
         - run: julia -e 'import Pkg; Pkg.activate("juliac"); Pkg.develop(path="dev/lowlevelparticlefilters");'
         - run: julia --project=juliac dev/julia/contrib/juliac.jl --output-exe juliac_demo --experimental --trim=unsafe-warn juliac/juliac_demo.jl
+          env:
+            JULIA_CPU_TARGET: cortex-a72
         - uses: actions/upload-artifact@v4
           with:
             name: juliac_demo
