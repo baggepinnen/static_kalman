@@ -87,7 +87,7 @@ name,ext = splitext(script)
 
 # oop
 using MacroTools
-expr = ModelingToolkit.RuntimeGeneratedFunctions.get_expression(f_oop)
+expr = ModelingToolkit.RuntimeGeneratedFunctions.get_expression(f_oop.f_oop)
 expr = expr |> MacroTools.flatten |> MacroTools.unblock |> MacroTools.rmlines # |> MacroTools.prettify
 
 expr = MacroTools.postwalk(expr) do x

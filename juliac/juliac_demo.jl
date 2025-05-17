@@ -10,7 +10,7 @@ println(Core.stdout, 0)
 const Ts  = 0.005 # sample time
 const x0  = SA[0.8, 0.5, 134.14, 130] # Initial state
 const u0 = SA[12.0, -4000] # Initial input
-const p = nothing
+const p = SA[0.0, 0.0] # not sure why this is needed...
 
 const lb = SA[0.1, 0.1, 50, 50, 5, -8500]
 const ub = SA[2, 2, 142, 140, 100, 0.0]
@@ -38,7 +38,7 @@ const d0 = LowLevelParticleFilters.SimpleMvNormal(x0,R1)   # Initial state Distr
 
 println(Core.stdout, 1)
 # const kf   = KalmanFilter(_A, _B, _C, 0, R1, R2, d0, check=false)
-const kf = UnscentedKalmanFilter(discrete_dynamics_wrapper, measurement, R1, R2, d0; ny, nu, p=nothing) 
+const kf = UnscentedKalmanFilter(discrete_dynamics_wrapper, measurement, R1, R2, d0; ny, nu, p=p) 
 println(Core.stdout, 2)
 
 Base.@ccallable function main()::Cint

@@ -1,0 +1,49 @@
+name: build-kalman
+on:
+  push:
+    branches:
+      - master
+      - bc/test-ci
+    tags: ['*']
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+jobs:
+  compile:
+    name: Run Juliac
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    permissions: # needed to allow julia-actions/cache to proactively delete old caches that it has created
+      actions: write
+      contents: read
+    steps:
+        - uses: actions/checkout@v4
+        - name: Checkout LLPF repo
+          uses: actions/checkout@v4
+          with:
+            repository: baggepinnen/LowLevelParticleFilters.jl
+            ref: juliac
+            path: dev/lowlevelparticlefilters
+        - name: Checkout Julia repo
+          uses: actions/checkout@v4
+          with:
+            repository: JuliaLang/julia
+            ref: v1.12.0-beta3
+            path: dev/julia
+        - uses: julia-actions/install-juliaup@v2
+          with:
+            channel: '1.12'
+        - uses: julia-actions/cache@v2
+        - run: julia -e 'import Pkg; Pkg.activate("juliac/build_model_project"); Pkg.instantiate(); cd("juliac/build_model_project"); include("cstr_model.jl"); cp("dynamics.jl", "../dynamics.jl")'
+        - run: julia -e 'import Pkg; Pkg.activate("juliac"); Pkg.develop(path="dev/lowlevelparticlefilters");'
+        - run: julia --project=juliac dev/julia/contrib/juliac.jl --output-exe juliac_demo --experimental --trim=unsafe-warn juliac/juliac_demo.jl
+          env:
+            JULIA_CPU_TARGET: cortex-a72
+        - uses: actions/upload-artifact@v4
+          with:
+            name: juliac_demo
+            path: juliac_demo
