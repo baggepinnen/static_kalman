@@ -35,7 +35,7 @@ jobs:
             path: dev/julia
         - uses: julia-actions/setup-julia@v2
           with:
-            version: nightly
+            version: 1.12
             arch: aarch64
         - uses: julia-actions/cache@v2
         - run: julia -e 'import Pkg; Pkg.activate("juliac/build_model_project"); Pkg.instantiate(); cd("juliac/build_model_project"); include("cstr_model.jl"); cp("dynamics.jl", "../dynamics.jl")'
