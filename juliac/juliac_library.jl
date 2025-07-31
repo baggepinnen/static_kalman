@@ -46,5 +46,5 @@ end
 
 # cd(@__DIR__)
 # compile using something like
-# run(`julia +1.12-nightly --project=/home/fredrikb/repos/static_kalman/juliac /home/fredrikb/.julia/juliaup/julia-1.12-nightly/share/julia/juliac.jl --output-lib juliac_library --trim=unsafe-warn --experimental --compile-ccallable /home/fredrikb/repos/static_kalman/juliac/juliac_library.jl`)
+# run(`julia +1.12-nightly --project=/home/fredrikb/repos/static_kalman/juliac /home/fredrikb/.julia/juliaup/julia-1.12-nightly/share/julia/juliac/juliac.jl --output-lib juliac_library --trim=unsafe-warn --experimental --compile-ccallable /home/fredrikb/repos/static_kalman/juliac/juliac_library.jl`)
 # gcc -o state_estimation_program test_juliac_library.c -I /home/fredrikb/.julia/juliaup/julia-1.12-nightly/include/julia/ -L/home/fredrikb/.julia/juliaup/julia-1.12-nightly/lib -ljulia -ldl

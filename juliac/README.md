@@ -17,8 +17,13 @@ juliac is not yet available in any released version of Julia and must thus be ob
 1. Obtain the juliac driver script by either cloning the [julialang/julia repo](https://github.com/JuliaLang/julia) or by downloading the scripts independently using the instructions provided [in this blog post](https://jbytecode.github.io/juliac/).
 2. Clone this repository and instantiate the manifest in this folder (a [special branch of LowLevelParticleFilters is required](https://github.com/baggepinnen/LowLevelParticleFilters.jl/tree/juliac)).
 3. Run the script `julia --project cstr_model.jl` to generate the julia file containing the function that computes the dynamics.
-4. Invoke the juliac compiler using something like `julia +nightly --project=<...>/static_kalman/juliac <...>/julia/contrib/juliac.jl --output-exe juliac_demo --trim=unsafe-warn <...>/static_kalman/juliac/juliac_demo.jl`. `julia +nightly` assumes that you are using the nightly version of julia installed using _juliaup_, if you have downloaded and compiled julia from source, point to your compiled binary instead. Replace `<...>` with the appropriate paths, i.e., the path to the julia source folder and the folder where you cloned this repository.
-5. Run the compiled binary `./juliac_demo` to perform the state estimation and output the log-likelihood of the data.
+4. Invoke the juliac compiler using something like `julia +1.12-nightly --project=<...>/static_kalman/juliac <...>/.julia/juliaup/julia-1.12-nightly/share/julia/juliac/juliac.jl --output-exe juliac_demo --trim=unsafe-warn --experimental <...>/static_kalman/juliac/juliac_demo.jl`. `+1.12-nightly` assumes that you are using the nightly version of julia installed using _juliaup_, if you have downloaded and compiled julia from source, point to your compiled binary instead. Replace `<...>` with the appropriate paths, i.e., the path to the julia source folder and the folder where you cloned this repository.
+5. Run the compiled binary `./juliac_demo` to perform the state estimation and output the log-likelihood of the data. The terminal output should look like this
+```
+I'm alive and well
+I read the data, it has length 30
+I got loglik = -238.8285148663645
+```
 
 
 ## Running on Raspberry Pi
@@ -27,6 +32,6 @@ Follow exactly the same procedure as above, but directly on the Raspberry Pi ins
 
 # Shared library demo
 Follow steps 1-3 from the instructions above. 
-4. Invoke the juliac compiler using something like `julia +1.12-nightly --project=<..>/static_kalman/juliac ~/.julia/juliaup/julia-1.12-nightly/share/julia/juliac.jl --output-lib juliac_library --trim=unsafe-warn --experimental --compile-ccallable <..>/static_kalman/juliac/juliac_library.jl`
+4. Invoke the juliac compiler using something like `julia +1.12-nightly --project=<..>/static_kalman/juliac ~/.julia/juliaup/julia-1.12-nightly/share/julia/juliac/juliac.jl --output-lib juliac_library --trim=unsafe-warn --experimental --compile-ccallable <..>/static_kalman/juliac/juliac_library.jl`
 5. Compile the C program using something like `gcc -o state_estimation_program test_juliac_library.c -I <..>/.julia/juliaup/julia-1.12-nightly/include/julia/ -L<..>/.julia/juliaup/julia-1.12-nightly/lib -ljulia -ldl`
 6. Run the compiled C program `./state_estimation_program` to perform the state estimation using the sample inputs defined in the C file.
