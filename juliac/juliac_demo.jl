@@ -44,18 +44,56 @@ Base.@ccallable function main()::Cint
     sol = forward_trajectory(kf, u, y)
     println(Core.stdout, "I got loglik = ", sol.ll)
 
-    # xT,_ = smooth(sol, kf, u, y)
-    # println(Core.stdout, "I also spent the effort smoothing the data, here's the result: ", xT)
     return zero(Cint)
 end
 
+
+# function take_heap_snapshot(filename::String)
+#     flags = Base.open_flags(
+#         read = true,
+#         write = true,
+#         create = true,
+#         truncate = true,
+#         append = false,
+#     )
+#     nodes = IOStream("<file $filename.nodes>")
+#     ccall(:ios_file, Ptr{Cvoid}, (Ptr{UInt8}, Cstring, Cint, Cint, Cint, Cint),
+#         nodes.ios, "$filename.nodes", flags.read, flags.write, flags.create, flags.truncate)
+#     edges = IOStream("<file $filename.edges>")
+#     ccall(:ios_file, Ptr{Cvoid}, (Ptr{UInt8}, Cstring, Cint, Cint, Cint, Cint),
+#         edges.ios, "$filename.edges", flags.read, flags.write, flags.create, flags.truncate)
+#     strings = IOStream("<file $filename.strings>")
+#     ccall(:ios_file, Ptr{Cvoid},(Ptr{UInt8}, Cstring, Cint, Cint, Cint, Cint),
+#         strings.ios, "$filename.strings", flags.read, flags.write, flags.create, flags.truncate)
+#     json = IOStream("<file $filename.metadata.json>")
+#     ccall(:ios_file, Ptr{Cvoid}, (Ptr{UInt8}, Cstring, Cint, Cint, Cint, Cint),
+#         json.ios, "$filename.metadata.json", flags.read, flags.write, flags.create, flags.truncate)
+#     ccall(:jl_gc_take_heap_snapshot,
+#         Cvoid,
+#         (Ptr{Cvoid},Ptr{Cvoid},Ptr{Cvoid},Ptr{Cvoid}, Cchar),
+#         nodes.handle, edges.handle, strings.handle, json.handle,
+#         Cchar(false))
+#     ccall(:ios_close, Cint, (Ptr{Cvoid},), nodes.ios)
+#     ccall(:ios_close, Cint, (Ptr{Cvoid},), edges.ios)
+#     ccall(:ios_close, Cint, (Ptr{Cvoid},), strings.ios)
+#     ccall(:ios_close, Cint, (Ptr{Cvoid},), json.ios)
+#     return nothing
+# end
+
+# take_heap_snapshot("heap_snapshot")
+
 end
 
+@main(args) = StateEstimator.main()
+
+# StateEstimator.main()
+
 # cd(@__DIR__)
-# compile using something like
-# run(`julia +1.12-nightly --project=/home/fredrikb/repos/static_kalman/juliac /home/fredrikb/.julia/juliaup/julia-1.12-nightly/share/julia/juliac/juliac.jl --output-exe juliac_demo --trim=unsafe-warn --experimental /home/fredrikb/repos/static_kalman/juliac/juliac_demo.jl`)
-# run(`ls -ltrh`) # marvel at the smallness of the binary
-# run(`./juliac_demo`)
+# Compile using JuliaC:
+# run(`juliac --output-exe juliac_demo --bundle build --trim=unsafe-warn --experimental --project=. juliac_demo.jl`)
+# The compiled binary will be at build/bin/juliac_demo
+# run(`ls -ltrh build/bin`) # marvel at the smallness of the binary
+# run(`./build/bin/juliac_demo`)
 
 
 # using Plots

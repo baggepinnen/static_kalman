@@ -1,6 +1,6 @@
-This demonstration shows how to use juliac to compile a binary that performs Kalman filtering with a model implemented using ModelingToolkit.jl.
+This demonstration shows how to use JuliaC to compile a binary that performs Kalman filtering with a model implemented using ModelingToolkit.jl.
 
-We include two demos, one where juliaC compiles an executable, and one where juliaC creates a shared library that is called from a C program.
+We include two demos, one where JuliaC compiles an executable, and one where JuliaC creates a shared library that is called from a C program.
 
 For the executable demo, we perform the following steps:
 
@@ -9,16 +9,21 @@ For the executable demo, we perform the following steps:
 1. Build a simple model of a continuously stirred tank reactor (CSTR) using MTK
 2. Generate a function that computes the dynamics on the form $\dot x = f(x, u, p, t)$ and  extract the julia expression of this function into a separate file.
 3. Define a state estimator (UKF) using [LowLevelParticleFilters.jl](https://baggepinnen.github.io/LowLevelParticleFilters.jl/dev/) and discretize the continuous-time dynamics using fixed-step RK4.
-4. Use juliac to compile a binary with a `main` function that reads some data from files and performs state estimation along the data trajectory, outputting the log-likelihood of the data.
+4. Use JuliaC to compile a binary with a `main` function that reads some data from files and performs state estimation along the data trajectory, outputting the log-likelihood of the data.
 
-juliac is not yet available in any released version of Julia and must thus be obtained by downloading the julia source.
+JuliaC is available in Julia 1.12+ and can be installed as a Julia app using the package manager.
 
 ## Instructions
-1. Obtain the juliac driver script by either cloning the [julialang/julia repo](https://github.com/JuliaLang/julia) or by downloading the scripts independently using the instructions provided [in this blog post](https://jbytecode.github.io/juliac/).
+1. Install JuliaC by running `pkg> app add JuliaC` in the Julia REPL. Optionally, add `~/.julia/bin` to your PATH to use `juliac` directly from the command line.
 2. Clone this repository and instantiate the manifest in this folder (a [special branch of LowLevelParticleFilters is required](https://github.com/baggepinnen/LowLevelParticleFilters.jl/tree/juliac)).
-3. Run the script `julia --project cstr_model.jl` to generate the julia file containing the function that computes the dynamics.
-4. Invoke the juliac compiler using something like `julia +1.12-nightly --project=<...>/static_kalman/juliac <...>/.julia/juliaup/julia-1.12-nightly/share/julia/juliac/juliac.jl --output-exe juliac_demo --trim=unsafe-warn --experimental <...>/static_kalman/juliac/juliac_demo.jl`. `+1.12-nightly` assumes that you are using the nightly version of julia installed using _juliaup_, if you have downloaded and compiled julia from source, point to your compiled binary instead. Replace `<...>` with the appropriate paths, i.e., the path to the julia source folder and the folder where you cloned this repository.
-5. Run the compiled binary `./juliac_demo` to perform the state estimation and output the log-likelihood of the data. The terminal output should look like this
+3. Run the script `julia +release --project cstr_model.jl` to generate the julia file containing the function that computes the dynamics.
+4. Invoke the JuliaC compiler using:
+```bash
+juliac --output-exe juliac_demo --bundle build --trim=unsafe-warn --experimental --project=. juliac_demo.jl
+```
+This creates a portable distribution in the `build/` directory with the executable in `build/bin/juliac_demo`.
+
+5. Run the compiled binary `./build/bin/juliac_demo` to perform the state estimation and output the log-likelihood of the data. The terminal output should look like this:
 ```
 I'm alive and well
 I read the data, it has length 30
@@ -31,7 +36,18 @@ Follow exactly the same procedure as above, but directly on the Raspberry Pi ins
 
 
 # Shared library demo
-Follow steps 1-3 from the instructions above. 
-4. Invoke the juliac compiler using something like `julia +1.12-nightly --project=<..>/static_kalman/juliac ~/.julia/juliaup/julia-1.12-nightly/share/julia/juliac/juliac.jl --output-lib juliac_library --trim=unsafe-warn --experimental --compile-ccallable <..>/static_kalman/juliac/juliac_library.jl`
-5. Compile the C program using something like `gcc -o state_estimation_program test_juliac_library.c -I <..>/.julia/juliaup/julia-1.12-nightly/include/julia/ -L<..>/.julia/juliaup/julia-1.12-nightly/lib -ljulia -ldl`
+Follow steps 1-3 from the instructions above.
+
+4. Invoke the JuliaC compiler using:
+```bash
+juliac --output-lib juliac_library --bundle build --compile-ccallable --trim=unsafe-warn --experimental --project=. juliac_library.jl
+```
+This creates the shared library at `build/lib/juliac_library.so` (or `.dylib` on macOS, `.dll` on Windows). Dependencies like OpenBLAS are placed in `build/lib/julia/`.
+
+5. Compile the C program using:
+```bash
+gcc -o state_estimation_program test_juliac_library.c -I <julia-path>/include/julia/ -L<julia-path>/lib -ljulia -ldl
+```
+Where `<julia-path>` is your Julia installation directory (e.g., `~/.julia/juliaup/julia-1.12+0`).
+
 6. Run the compiled C program `./state_estimation_program` to perform the state estimation using the sample inputs defined in the C file.

@@ -45,6 +45,8 @@ end
 
 
 # cd(@__DIR__)
-# compile using something like
-# run(`julia +1.12-nightly --project=/home/fredrikb/repos/static_kalman/juliac /home/fredrikb/.julia/juliaup/julia-1.12-nightly/share/julia/juliac/juliac.jl --output-lib juliac_library --trim=unsafe-warn --experimental --compile-ccallable /home/fredrikb/repos/static_kalman/juliac/juliac_library.jl`)
-# gcc -o state_estimation_program test_juliac_library.c -I /home/fredrikb/.julia/juliaup/julia-1.12-nightly/include/julia/ -L/home/fredrikb/.julia/juliaup/julia-1.12-nightly/lib -ljulia -ldl
+# Compile using JuliaC:
+# run(`juliac --output-lib juliac_library --bundle build --compile-ccallable --trim=unsafe-warn --experimental --project=. juliac_library.jl`)
+# The compiled library will be at build/lib/juliac_library.so (or .dylib/.dll)
+# gcc -o state_estimation_program test_juliac_library.c -I <julia-path>/include/julia/ -L<julia-path>/lib -ljulia -ldl
+# where <julia-path> is your Julia installation directory (e.g., ~/.julia/juliaup/julia-1.12+0)

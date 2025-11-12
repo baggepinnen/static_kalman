@@ -5,10 +5,10 @@
 #include "juliac_library.h"
 
 // Path to julia binary folder
-#define JULIA_PATH "/home/fredrikb/.julia/juliaup/julia-1.12-nightly/bin/" // NOTE: modify this path
+#define JULIA_PATH "/home/fredrikb/.julia/juliaup/julia-1.12.1+0.x64.linux.gnu/bin/" // NOTE: modify this path
 
-// Path to juliac compiled shared object file
-#define LIB_PATH "/home/fredrikb/repos/static_kalman/juliac/juliac_library.so" // NOTE: modify this path
+// Path to juliac compiled shared object file (created by JuliaC with --bundle flag)
+#define LIB_PATH "/home/fredrikb/repos/static_kalman/juliac/build/lib/juliac_library.so" // NOTE: modify this path
 
 int main() {
 
@@ -70,4 +70,4 @@ int main() {
 
 
 // Compile this C program using a command like the one below, modified to suit your paths
-// gcc -o state_estimation_program test_juliac_library.c -I /home/fredrikb/.julia/juliaup/julia-1.12-nightly/include/julia/ -L/home/fredrikb/.julia/juliaup/julia-1.12-nightly/lib -ljulia -ldl
+// gcc -o state_estimation_program test_juliac_library.c -I /home/fredrikb/.julia/juliaup/julia-1.12.1+0.x64.linux.gnu/include/julia/ -L/home/fredrikb/.julia/juliaup/julia-1.12.1+0.x64.linux.gnu/lib -ljulia -ldl

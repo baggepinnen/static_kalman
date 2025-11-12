@@ -29,7 +29,6 @@ function cstr(x, u, p=p_cstr, _=0)
 
     (; K0_ab,K0_bc,K0_ad,R_gas,E_A_ab,E_A_bc,E_A_ad,Hᵣ_ab,Hᵣ_bc,Hᵣ_ad,Rou,Cp,Cpₖ,Aᵣ,Vᵣ,m_k,T_in,K_w,C_A0) = p
 
-
     F, Q̇    = u
     K₁      = K0_ab * exp((-E_A_ab)/((Tᵣ+273.15)))
     K₂      = K0_bc * exp((-E_A_bc)/((Tᵣ+273.15)))
@@ -51,7 +50,7 @@ This model has 4 states and 2 inputs.
 
 `sys` has the following fields:
 - `dynamics`: the dynamics of the system in the form of a [`FunctionSystem`](@ref)
-- `sys`: the system in the form of a [`ODESystem`](@ref)
+- `sys`: the system in the form of a [`System`](@ref)
 - `Ts`: a suggested sample time for the system
 - `x0`: a suggested initial state of the system
 - `lb`: a vector of pairs with lower bounds for all variables
@@ -69,9 +68,8 @@ function CSTR(; name)
         F(t), [description = "Feed", input=true],
         Q̇(t), [description = "Heat flow", input=true]
     end
-    vars = [Cₐ, Cᵦ, Tᵣ, Tₖ, F, Q̇]
     eqs = cstr([Cₐ, Cᵦ, Tᵣ, Tₖ], [F, Q̇], p_cstr, t)
-    sys = ODESystem(D.([Cₐ, Cᵦ, Tᵣ, Tₖ]) .~ eqs, t; name)
+    System(D.([Cₐ, Cᵦ, Tᵣ, Tₖ]) .~ eqs, t; name)
 end
 
 @named model = CSTR()
@@ -87,7 +85,7 @@ name,ext = splitext(script)
 
 # oop
 using MacroTools
-expr = ModelingToolkit.RuntimeGeneratedFunctions.get_expression(f_oop)
+expr = ModelingToolkit.RuntimeGeneratedFunctions.get_expression(f_oop.f_oop)
 expr = expr |> MacroTools.flatten |> MacroTools.unblock |> MacroTools.rmlines # |> MacroTools.prettify
 
 expr = MacroTools.postwalk(expr) do x
